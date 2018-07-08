@@ -13,6 +13,12 @@ activate <- function(...) {
   }
 }
 
+rndGolfQuote <- function() {
+  raw   <- read.csv("golf_quotes.csv", header = FALSE)
+  quote <- raw[sample(nrow(raw),1),]
+  cat(paste0(quote$V2, " - ", quote$V1))
+}
+
 rndQuote <- function(n = 1) {
   # rndQuote() # 2018-05-09
   fileName <- paste0(
