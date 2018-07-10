@@ -1,0 +1,111 @@
+---
+title: "M44[0]-Preprocessing"
+author: "LS"
+date: "2018년 7월 8일"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+Sys.setenv(LANG = "kr")
+Sys.setlocale("LC_ALL", "Korean")
+```
+
+## I. 불러오기  
+
+![Screenshot of raw data](fig/fig1.png)\  
+
+```{r}
+raw <- read.csv("raw_subway.csv", stringsAsFactors = FALSE)  
+```
+  
+```{r}
+str(raw)
+head(raw)
+dim(raw)
+```
+
+```{r}
+colnames(raw) <- c("Date", "Line", "Stn", "UD", paste0("V", 0:23)) # UD for up or down
+```
+
+### 1. 아래 코드는 역명에서 괄호를 기준으로 역이름(`Name`)과 코드(`Code`)를 분리하려는 시도입니다.  
+
+그런데 `청량리(지하)(153)`에 괄호가 두 개가 있어서 원하는 결과를 얻을 수 없습니다.  
+
+```{r}
+# --------------------------------------------------------------------
+# splitNameCode <- function(x) {
+#   nameCode    <- strsplit(x, split = "[(]") %>% unlist()
+#   nameCode[2] <- substr(nameCode[2], 1, nchar(nameCode[2])-1)
+#   return(nameCode)
+# }
+# nameCodeList <- sapply(raw$Stn, splitNameCode) 
+# raw$Name <- lapply(nameCodeList, function(x) x[1]) %>% unlist()
+# raw$Code <- lapply(nameCodeList, function(x) x[2]) %>% unlist()
+# head(raw)
+# --------------------------------------------------------------------
+```
+
+### 2. 그러므로 다른 전략을 생각해 보아야 합니다.  
+
+우선 어떤 값들이 있는지, 어떤 패턴이 있는지 찾아봅니다.  
+
+```{r}
+unique(raw$Stn)
+```
+
+모든 역의 코드가 괄호 안의 세자리 숫자로 되어있음을 알 수 있습니다.  
+그러므로 아래의 명령으로 간단하게 역이름(`Name`)과 코드(`Code`)를 분리할 수 있습니다.  
+
+```{r}
+raw$Name <- substr(raw$Stn, start = 1,                stop = nchar(raw$Stn)-5)
+raw$Code <- substr(raw$Stn, start = nchar(raw$Stn)-3, stop = nchar(raw$Stn)-1) %>% as.numeric()
+```
+
+## II. Cleaning & Making data.frame   
+
+저는 항상 `raw` 데이터셋에서 시작하여 tidy한 `data.frame`을 만들면 그것에 이름을 `dataset`라고 붙여줍니다.  
+여러분도 각자의 규칙과 convention을 만들어 보세요.  
+
+```{r}
+raw <- raw %>% 
+  select(-c(Line, Stn)) %>%  # 1) remove `Line` and `Stn`
+  select(-c(V1, V2, V3))     # 2) remove `V1`, `V2`, `V3` 
+# 3) fill NA with zero for `V0`, `V4-V23`
+for (V in c("V0", paste0("V", 4:23))) {
+  x <- raw[,V] 
+  x[is.na(x)] <- 0
+  raw[,V] <- x
+}
+# 4) `gather` in `table4a` in `M51`
+raw <- raw %>%
+  gather(colnames(raw)[3:23], key = "hour", value = "pax")
+# 5) define `depArr` from `UD`, and kill `UD`
+raw <- raw %>%
+  mutate(depArr = ifelse(UD == "승차", "dep", "arr")) %>%
+  select(-UD)
+# 6) make hour to number
+raw$hour <- substr(raw$hour, 2, nchar(raw$hour)) %>% as.numeric
+# 7) rearrange `raw` and now we have tidy `dataset`
+dataset <- raw %>% 
+  select(Date, Code, Name, hour, depArr, pax) %>%
+  arrange(Date, Code, Name, hour, depArr, pax)
+```
+
+## III. 일별/역별 승하차 승객수    
+
+데이터셋의 크기 관계로 수업 시간에 적합할 수준인 일별로 집계합니다.  
+시간대로도 비슷한 분석을 수행해 보세요.  
+
+```{r}
+dataset <- dataset %>%
+  group_by(Date, Code, Name, depArr) %>% summarise(dayPax = sum(pax)) 
+head(dataset)
+write.csv(dataset, "dataset_subway_daily.csv")
+```
+
