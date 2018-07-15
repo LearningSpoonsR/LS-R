@@ -1,0 +1,91 @@
+---
+title: "M44[1]-Analysis"
+author: "LS"
+date: "2018년 7월 8일"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+library(plotly)
+Sys.setenv(LANG = "kr")
+Sys.setlocale("LC_ALL", "Korean")
+```
+
+## I. 불러오기  
+
+```{r}
+dataset <- read.csv("dataset_subway_daily.csv", stringsAsFactors = FALSE)  
+head(dataset)
+sapply(dataset, class)
+dataset$Date   <- dataset$Date %>% as.Date()
+dataset$dow    <- dataset$Date %>% weekdays() %>% as.factor()
+dataset$depArr <- dataset$depArr %>% as.factor() 
+head(dataset)
+```
+
+## II. Quiz
+
+#### 1. (`dplyr`) 2호선 역중에서 2014년 1년간 가장 승하차인원의 합이 많았던 역과 적었던 역 10개를 각각 찾아주세요.  
+
+```{r}
+# 1)
+dataset %>% 
+  filter(substr(Code, 1, 1)==2) %>%
+  group_by(Code, Name) %>% summarise(dayPaxTotal = sum(dayPax)) %>%
+  arrange(desc(dayPaxTotal)) %>% head(10)
+# 2) 
+dataset %>% 
+  filter(substr(Code, 1, 1)==2) %>%
+  group_by(Code, Name) %>% summarise(dayPaxTotal = sum(dayPax)) %>%
+  arrange(desc(dayPaxTotal)) %>% tail(10)
+```
+
+
+#### 2. (`ggplot2`) 강남역의 요일별 이용승객수에 대해서 `boxplot`을 그려주세요.  
+
+```{r}
+dataset2 <- dataset %>% 
+  filter(Code == 222) %>%
+  group_by(Date, dow) %>% summarise(dayPaxTotal = sum(dayPax))
+library(ggplot2)
+ggplot(dataset2) + geom_boxplot(aes(x = dow, y = dayPaxTotal)) +
+  coord_flip()
+```
+
+#### 3. (`ggplot2`) 강남역의 요일별 이용승객수에 대해서 piechart를 그려주세요.
+
+```{r}
+ggplot(dataset2, aes(x = "", y = dayPaxTotal, fill = factor(dow))) + 
+  geom_bar(width = 1, stat = "identity") +
+  theme(axis.line = element_blank(),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(fill = "dow", x = NULL, y = NULL, title = "Pie Chart of Station 222") +
+  coord_polar(theta = "y", start = 0)
+```
+
+
+#### 4. (`dygraph`) 양재역의 승차인원과 하차인원에 대해서 각각 시계열 차트를 그려주세요.  신분당선의 강남-신사 구간이 2022년 1월에 연장 개통된다고 합니다.  
+
+```{r, message = FALSE}
+stn <- dataset %>% 
+  filter(Name == "양재") %>%
+  select(Date, Code, Name, depArr, dayPax)
+library(xts)
+library(dygraphs)
+dep_stn <- stn %>% filter(depArr=="dep") %>% select(dayPax)
+arr_stn <- stn %>% filter(depArr=="arr") %>% select(dayPax)
+time_index <- stn %>% filter(depArr=="arr")
+time_index <- time_index$Date
+stn_xts <- xts(cbind(dep_stn, arr_stn), order.by = time_index)
+colnames(stn_xts) <- c("dep_stn", "arr_stn")
+dygraph(stn_xts) %>% dyRangeSelector() 
+```
+
+
+
+
