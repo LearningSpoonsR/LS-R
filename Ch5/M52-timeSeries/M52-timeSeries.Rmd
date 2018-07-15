@@ -1,5 +1,5 @@
 ---
-title: "Time Series Data (xts, dygraph, lubridate)"
+title: "M52-Time Series Data (xts, dygraph, lubridate)"
 author: "LearningSpoonsR "
 date: "`r Sys.Date()`"
 fontsize: 9pt
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(background = '718CBA')
   - `data.frame`의 많은 명령어를 그대로 사용할 수 있음.  
   - `data.frame`의 `rownames`에 해당하는 특성을 `index`라고 하는데,  
   - `index`에 시간에 대한 정보가 포함되어 있음.
-  - 죽, `index`는 `Date` 객체등 시간을 나타내는 데이터 타입.
+  - 즉, `index`는 `Date` 객체등 시간을 나타내는 데이터 타입.
 
 ##
 
@@ -185,7 +185,7 @@ $\vspace{5pt}$
 
 - 전년 동월 말일
 ```{r}
-ceiling_date(theDay-years(1))
+ceiling_date(theDay-years(1), "month") - 1
 ```
 $\vspace{5pt}$  
 
@@ -215,7 +215,7 @@ $\vspace{5pt}$
 
 - `weekdays(theDay-years(1))`는 `r weekdays(theDay-years(1))`입니다. 그래서 기록이 없습니다.  
 - 많은 시계열 데이터가 이와 같이 관찰값이 없는 시간이 많습니다.  
-- 처음에 시계열 데이터를 다루기가 이유는 이 때문이고, 코드가 **더러워** 지는 결과를 흔히 초래합니다.  
+- 처음에 시계열 데이터를 다루기가 어려운 이유는 이 때문이고, 코드가 **더러워** 지는 결과를 흔히 초래합니다.  
 - 그렇기 때문에 흔히 `tidyverse` (`dplyr`의 상위 패키지)의 `fill`과 같은 명령을 사용해서 데이터셋을 365일로 강제로 바꾸기도 합니다.  
 - 그런데 이 경우에는 관찰값이 있었던 날과 아닌 날이 구분이 안되므로 또 다른 문제를 야기하기도 합니다.  
 - 그렇다면 이런 경우에는 어떻게 해야할까요?
