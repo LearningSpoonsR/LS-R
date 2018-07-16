@@ -1,0 +1,141 @@
+---
+title: "M45-retail-shinyapps.io "  
+author: "LearningSpoonsR "
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    source: embed
+---  
+
+```{r setup, include=FALSE}
+library(rmarkdown)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(background = '718CBA')
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readxl)
+library(knitr)
+library(kableExtra)
+dataset <- read_excel("data/retail.xlsx")
+```
+
+Selections {.sidebar}
+===============================
+
+```{r}
+dateRangeInput(inputId = "dateRange", label = "Select Date Range", 
+               start = min(dataset$`Order Date`),
+               end   = max(dataset$`Order Date`))
+```
+
+Category Analysis    
+===================================== 
+
+Column {data-width=500}  
+-------------------------------------
+
+### Sales Contribution  
+ 
+```{r}  
+# Reference: p.24-p.26 in M45-beamer.pdf 
+renderPlot({
+  task1a <- dataset %>% 
+    filter(`Order Date` >= as.POSIXct(input$dateRange[1]), 
+           `Order Date` <= as.POSIXct(input$dateRange[2])) %>%
+    group_by(Category) %>% 
+    summarise(Sales = sum(Sales), Profit = sum(Profit)) %>%
+    mutate(profitRatio = round(Profit/Sales,2)) %>%
+    arrange(desc(profitRatio))
+  a <- ggplot(task1a, aes(x = "", y = Sales, fill = factor(Category))) +
+    geom_bar(width = 1, stat = "identity") +
+    theme(axis.line = element_blank(),
+          plot.title = element_text(hjust = 0.5)) +
+    labs(fill = "Category", x = NULL, y = NULL,
+         title = "Sales Contribution") +
+    coord_polar(theta = "y", start = 0)
+  print(a)
+})  
+```   
+  
+Column {data-width=500}  
+-------------------------------------
+  
+### Profit Contribution  
+
+```{r}  
+# Reference: p.24-p.26 in M45-beamer.pdf 
+renderPlot({
+  task1a <- dataset %>% 
+    filter(`Order Date` >= as.POSIXct(input$dateRange[1]), 
+           `Order Date` <= as.POSIXct(input$dateRange[2])) %>%
+    group_by(Category) %>% 
+    summarise(Sales = sum(Sales), Profit = sum(Profit)) %>%
+    mutate(profitRatio = round(Profit/Sales,2)) %>%
+    arrange(desc(profitRatio))
+  a <- ggplot(task1a, aes(x = "", y = Profit, fill = factor(Category))) +
+    geom_bar(width = 1, stat = "identity") +
+    theme(axis.line = element_blank(),
+          plot.title = element_text(hjust = 0.5)) +
+    labs(fill = "Category", x = NULL, y = NULL,
+         title = "Profit Contribution") +
+    coord_polar(theta = "y", start = 0)
+  print(a)
+})  
+```   
+
+Sub-Category Analysis      
+=====================================   
+
+Column {data-width=400}  
+-------------------------------------  
+
+### Total Sales and Profit  
+
+```{r}
+renderTable({
+  task1b <- dataset %>%
+    filter(`Order Date` >= as.POSIXct(input$dateRange[1]), 
+           `Order Date` <= as.POSIXct(input$dateRange[2])) %>%
+    group_by(`Sub-Category`) %>%
+    summarise(Sales = sum(Sales), Profit = sum(Profit)) %>%
+    mutate(profitRatio = round(Profit/Sales,2)) %>%
+    arrange(desc(Sales))
+  task1b
+})
+```
+
+Column {data-width=600}  
+-------------------------------------  
+
+### Diverging Bar    
+
+```{r}
+renderPlot({
+  task1b <- dataset %>%
+    filter(`Order Date` >= as.POSIXct(input$dateRange[1]), 
+           `Order Date` <= as.POSIXct(input$dateRange[2])) %>%
+    group_by(`Sub-Category`) %>%
+    summarise(Sales = sum(Sales), Profit = sum(Profit)) %>%
+    mutate(profitRatio = round(Profit/Sales,2)) %>%
+    arrange(desc(profitRatio))
+  task1b$profitHL <-
+    ifelse(task1b$profitRatio < mean(task1b$profitRatio), "below average", "above average")
+  task1b <- task1b %>% arrange(profitRatio)
+  # Convert to factor to preserve sorted order in plot.
+  task1b$`Sub-Category` <- factor(task1b$`Sub-Category`, levels = task1b$`Sub-Category`)
+  a <- ggplot(task1b, aes(x = `Sub-Category`, y = profitRatio, label = profitRatio)) +
+    geom_bar(stat = 'identity', aes(fill = profitHL), width = .5) +
+    scale_fill_manual(
+      name = "Profit Ratio",
+      labels = c("Below Average", "Above Average"),
+      values = c("below average" = "#f8766d", "above average" = "#00ba38")) +
+    labs(title = "Diverging bar",
+         subtitle = "Profitability of each Sub-Category") +
+    coord_flip()
+  print(a)
+})  
+```
+
+
+
