@@ -1,0 +1,50 @@
+---
+title: "2018-07-19"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Hello1  
+
+```{r}
+"Hello1"
+```
+
+### Hello2  
+
+```{r}
+"Hello2"
+```
+
+### Hello3  
+
+```{r}
+"Hello3"
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Hello4
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+a <- ggplot(mpg) + geom_point(aes(x = displ, y = hwy, color = class))
+b <- ggplot(mpg) + geom_point(aes(x = displ, y = hwy, size = class))
+grid.arrange(a, b, nrow = 2, ncol = 1)
+```
+
+### Hello5
+
+```{r}
+"Hello5"
+```
