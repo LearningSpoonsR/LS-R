@@ -35,29 +35,24 @@ knitr::opts_chunk$set(background = '718CBA')
   + `M13-quiz`  
   
 2. `Week 2` (Carseats)  
-  + `M21-dplyr`   
-  + `M22-ggplot2-part1` (dep: `M21`)  
-  + `M23-rmd`           (dep: `M21`-`M22`)  
-  + `M24-Carseat`       (dep: `M21`-`M23`)  
+  + `M21-dplyr_ggplot_rmd`   
+  + `M22-Carseats` (dep: `M21`) 
 
-3. `Week 3` (WordCloud & Share)  
-  + `M31-ggplot2-part2`      
-  + `M32-textmining` (dep: `M31`)  
-  + `M33-writing functions`  
-    (dep: `M31`-`M32`)  
+3. `Week 3` (WordCloud & FD & Shiny)  
+  + `M31-ggplot_wordcloud`      
+  + `M32-flexdashboard` (dep: `M31`)  
+  + `M33-shiny` (dep: `M31`-`M32`)  
     
 \endcol
 \begcol{.48\textwidth}
-
-  + `M34-flexdashboard`  
-    (dep: `M23`, `M31`-`M33`)   
-  + `M35-WordcloudFD`    (dep: `M31`-`M34`)  
-  + `M36-shiny`          (dep: `M31`-`M35`)  
-  + `M37-WordcloudShiny` (dep: `M31`-`M36`)
   
-4. `Week 4` (API & Automation)   
-  + `M41-kma`  
-  + `M42-dart&molit` (dep: `M41`)  
+4. `Week 4` (API & map & CaseStudy)   
+  + `M41-kma&automation`    
+  + `M42-dart` (dep: `M41`)  
+  + `M43-apis` (dep: `M41`-`M42`)   
+  + `M44-subway`  
+  + `M45-retail`  
+  + `M46-retail-shiny` (dep: `M45`)   
 
 5. `Week 5` (Other Topics)  
   + `M51-tidyr`  
@@ -119,12 +114,13 @@ knitr::opts_chunk$set(background = '718CBA')
 
 ## 1. 프로그램의 목적을 정하고 구현    
 
-### What does it first, then ask how!   
+### Find what should it do first, then ask how!   
 + 돌아가고, 느리고, 무식하더라도 **한 번** 가보는 것이 중요.     
 + 프로그램 경험으로 기하적으로 빠른 프로그래머가 되어감.  
 
 ### Try 1-2-3 and generalize it.   
-+ ``1''에 많은 시간을 쓰는 것을 두려워 말아야...    
++ ``1''에 많은 시간을 쓰는 것을 두려워 말아야    
++ 레고를 만들듯이, 큐브를 맞추듯이...  
 + 공통점과 차이점을 발견하여 함수, 클래스, 패키지를 작성     
 + 새로운 도구를 익혀나감 (Python, Graphics, 통계...)    
 
@@ -143,7 +139,7 @@ knitr::opts_chunk$set(background = '718CBA')
 ### 일 잘하는 사람   
 + 새로운 문제를 찾아낼 수 있는 사람  
 + 필요한 지식과 자원을 찾아낼 수 있는 사람  
-+ 문제를 공유할 수 있는 사람   
++ 문제와 결론을 공유할 수 있는 사람   
 
 ## 3. 방어적인 프로그래밍 (Defensive Programming)  
 
