@@ -35,8 +35,10 @@ fig_num <- 0
 위의 요청메시지를 작성하여 API database에 접속합니다.  아래의 코드블럭으로 이를 구성해보겠습니다.  
 
 ```{r}
-svc_key <- paste0("uEID6no5WOeFLEu%2FYZpdjKHQVrE2HtFEig4lJ7iHWiE5w",
-                  "GS1L3RvmusPMDkumoj8f%2BSffvPYWO%2B5xXu%2FrQ%2Bvzg%3D%3D")
+# svc_key <- paste0("uEID6no5WOeFLEu%2FYZpdjKHQVrE2HtFEig4lJ7iHWiE5w",
+#                   "GS1L3RvmusPMDkumoj8f%2BSffvPYWO%2B5xXu%2FrQ%2Bvzg%3D%3D")
+svc_key <- paste0("athSwG16TabsGNW4800qCKe%2Fn2IV47bKvlLPYrz3JB8r8PQf",
+                  "ql5GPoQgs6faR99yx1OcDpDtHATDKBoER29TuA%3D%3D")
 today   <- gsub("-", "", Sys.Date())
 url     <- paste0("http://newsky2.kma.go.kr/service/SecndSrtpdFrcstInfoService2",
                   "/ForecastSpaceData")
